@@ -1,14 +1,15 @@
-FROM nikolaik/python-nodejs:python3.10-nodejs20
-
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends ffmpeg \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+FROM python:3.11-slim
 
 WORKDIR /app
 COPY . .
 
-RUN pip3 install --no-cache-dir --upgrade pip \
-    && pip3 install --no-cache-dir --upgrade -r requirements.txt
+# Fix FFmpeg for Railway
+RUN apt-get update -qq && \
+    apt-get install -y ffmpeg && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-CMD bash start
+RUN pip install --no-cache-dir -r requirements.txt
+
+EXPOSE 8080
+CMD ["python", "start.py"]
